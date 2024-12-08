@@ -1,0 +1,7 @@
+#!/bin/bash
+SUM="0"
+cat input.txt | grep -E "mul\([0-9]{1,3},[0-9]{1,3}\)" -o | grep -E "[0-9]{1,3},[0-9]{1,3}" -o | tr , '*' > temporarySolutiondata.txt
+while read line; do
+  SUM=$(($SUM+$(($line))))
+done < temporarySolutiondata.txt
+echo $SUM
