@@ -1,0 +1,19 @@
+[package]
+name = "day_temp"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name="1"
+path="solution1.rs"
+
+
+[[bin]]
+name = "2"
+path="solution2.rs"
+
+
+[dependencies]
+loadingbar = {git="https://github.com/TageDan/Loading_Bars"}
+rayon = "1.10.0"
+
