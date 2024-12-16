@@ -14,6 +14,5 @@ path="solution2.rs"
 
 
 [dependencies]
-loadingbar = {git="https://github.com/TageDan/Loading_Bars"}
-rayon = "1.10.0"
+numext-fixed-uint = "0.1.6"
 
