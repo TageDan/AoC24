@@ -1,11 +1,8 @@
-use std::{
-    collections::{BinaryHeap, HashMap, HashSet},
-    io::BufRead,
-};
+use std::collections::{BinaryHeap, HashMap};
 
 const INPUT: &str = include_str!("input.txt");
 
-const dirs: [(i32, i32); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
+const DIRS: [(i32, i32); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
 
 #[derive(Eq, PartialEq, Debug)]
 struct State {
@@ -13,7 +10,6 @@ struct State {
     dir: usize,
     turns: usize,
     steps: usize,
-    path: Vec<(i32, i32)>,
 }
 
 impl PartialOrd for State {
@@ -29,13 +25,12 @@ impl Ord for State {
 }
 
 impl State {
-    fn new(pos: (i32, i32), dir: usize, turns: usize, steps: usize, path: Vec<(i32, i32)>) -> Self {
+    fn new(pos: (i32, i32), dir: usize, turns: usize, steps: usize) -> Self {
         Self {
             pos,
             dir,
             turns,
             steps,
-            path,
         }
     }
 
@@ -68,7 +63,7 @@ fn main() {
 
 fn lowest_score(pos: (i32, i32), walls: &Vec<(i32, i32)>, end: (i32, i32), dir: usize) -> usize {
     let mut heap = BinaryHeap::new();
-    let mut state = State::new(pos, dir, 0, 0, vec![pos]);
+    let mut state = State::new(pos, dir, 0, 0);
     let mut visited_lowest_cost = HashMap::new();
     visited_lowest_cost.insert((state.pos, state.dir), 0_usize);
     heap.push(state);
@@ -78,41 +73,26 @@ fn lowest_score(pos: (i32, i32), walls: &Vec<(i32, i32)>, end: (i32, i32), dir: 
             println!("{state:?}");
             return state.cost();
         }
-        let dir = dirs[rotate_left(state.dir)];
+        let dir = DIRS[rotate_left(state.dir)];
         let r_left = State {
             pos: (state.pos.0 + dir.0, state.pos.1 + dir.1),
             dir: rotate_left(state.dir),
             turns: state.turns + 1,
             steps: state.steps + 1,
-            path: [(state.pos.0 + dir.0, state.pos.1 + dir.1)]
-                .iter()
-                .chain(&state.path)
-                .map(|x| *x)
-                .collect(),
         };
-        let dir = dirs[rotate_right(state.dir)];
+        let dir = DIRS[rotate_right(state.dir)];
         let r_right = State {
             pos: (state.pos.0 + dir.0, state.pos.1 + dir.1),
             dir: rotate_right(state.dir),
             turns: state.turns + 1,
             steps: state.steps + 1,
-            path: [(state.pos.0 + dir.0, state.pos.1 + dir.1)]
-                .iter()
-                .chain(&state.path)
-                .map(|x| *x)
-                .collect(),
         };
-        let dir = dirs[state.dir];
+        let dir = DIRS[state.dir];
         let forward = State {
             pos: (state.pos.0 + dir.0, state.pos.1 + dir.1),
             dir: state.dir,
             steps: state.steps + 1,
             turns: state.turns,
-            path: [(state.pos.0 + dir.0, state.pos.1 + dir.1)]
-                .iter()
-                .chain(&state.path)
-                .map(|x| *x)
-                .collect(),
         };
         if (!visited_lowest_cost.contains_key(&(r_left.pos, r_left.dir))
             || r_left.cost() <= *visited_lowest_cost.get(&(r_left.pos, r_left.dir)).unwrap())

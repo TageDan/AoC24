@@ -8,67 +8,26 @@ struct Machine {
 
 impl Machine {
     fn cost_to_win(&self) -> Option<i64> {
-        let solutions_x = solve_simultaneous(
-            self.a_button[0],
-            self.b_button[0],
-            self.prize[0],
-            self.a_button[1],
-            self.b_button[1],
-            self.prize[1],
-        );
-        println!("done with gathering possible solutions");
-        solutions_x.iter().map(|x| x[0] * 3 + x[1]).min()
-    }
-}
+        let a1 = self.a_button[0];
+        let a2 = self.a_button[1];
+        let b1 = self.b_button[0];
+        let b2 = self.b_button[1];
+        let p1 = self.prize[0];
+        let p2 = self.prize[1];
 
-fn solve_single_diophantine(a: i64, b: i64, c: i64) -> Option<(i64, i64, i64, i64)> {
-    let (gcd, x0, y0) = extended_gcd(a, b);
-    if c % gcd != 0 {
-        None // No solutions
-    } else {
-        let scale = c / gcd;
-        Some((x0 * scale, y0 * scale, b / gcd, a / gcd))
-    }
-}
+        let area_ab = (a2 * b1 - a1 * b2).abs();
+        let area_ap = (a2 * p1 - p2 * a1).abs();
+        if area_ab == 0 {
+            return None;
+        }
+        let lb = area_ap / area_ab;
+        let la = (p1 - b1 * lb).abs() / a1;
 
-fn solve_simultaneous(a1: i64, b1: i64, c1: i64, a2: i64, b2: i64, c2: i64) -> Vec<[i64; 2]> {
-    if let Some((x1, y1, step_x1, step_y1)) = solve_single_diophantine(a1, b1, c1) {
-        let new_a = a2 * step_x1 + b2 * step_y1;
-        let new_c = c2 - a2 * x1 - b2 * y1;
-
-        if new_a == 0 {
-            if new_c == 0 {
-                return vec![];
-            } else {
-                return vec![];
-            }
+        if la * a1 + lb * b1 != p1 || la * a2 + lb * b2 != p2 {
+            return None;
         }
 
-        if let Some((k1, _, step_k1, _)) = solve_single_diophantine(new_a, 0, new_c) {
-            let mut solutions = Vec::new();
-
-            let mut k = 0;
-            while 
-
-            for k in -10..=10 {
-                let final_k1 = k1 + k * step_k1;
-                let x = x1 + final_k1 * step_x1;
-                let y = y1 + final_k1 * step_y1;
-                solutions.push([x, y]);
-            }
-            return solutions;
-        }
-    }
-
-    vec![]
-}
-
-fn extended_gcd(a: i64, b: i64) -> (i64, i64, i64) {
-    if b == 0 {
-        (a, 1, 0)
-    } else {
-        let (gcd, x1, y1) = extended_gcd(b, a % b);
-        (gcd, y1, x1 - (a / b) * y1)
+        Some(la * 3 + lb)
     }
 }
 
@@ -86,8 +45,8 @@ fn main() {
             _ => machines.push(Machine {
                 a_button: a.clone(),
                 b_button: b.clone(),
-                // prize: [prize[0] + 10000000000000, prize[1] + 10000000000000],
-                prize: prize.clone(),
+                prize: [prize[0] + 10000000000000, prize[1] + 10000000000000],
+                // prize: prize.clone(),
             }),
         }
 

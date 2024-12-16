@@ -14,4 +14,5 @@ path="solution2.rs"
 
 
 [dependencies]
+gcd = "2.3.0"
 
